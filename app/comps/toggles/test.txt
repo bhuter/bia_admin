@@ -1,0 +1,372 @@
+"use client";
+import { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import axios from "axios";
+import MessageBox from "@/app/pages/Message";
+
+interface Product {
+  id: number;
+  name: string;
+  price: string;
+  category: string;
+  description: string;
+  image: string;
+  created_at: string;
+  archived_at: string | null;
+  status: string;
+  stock: number | null;
+  sizes: string | null;
+  colors: string | null;
+  state: string | null;
+  discount: number | null;
+  delivery_days: number | null;
+  relational_images: string[] | null;
+}
+
+interface FormData {
+  sizes: string;
+  colors: string;
+  state: string;
+  stock: string;
+  discount: string;
+  delivery_days: string;
+  mainPhoto: File | null;
+  relationalImages: File[];
+}
+
+interface SetupProductProps {
+  productId: number;
+  onClose: () => void;
+}
+
+const SetupProduct: React.FC<SetupProductProps> = ({ productId, onClose }) => {
+  const [productData, setProductData] = useState<Product | null>(null);
+  const [formData, setFormData] = useState<FormData>({
+    sizes: "",
+    colors: "",
+    state: "",
+    stock: "",
+    discount: "",
+    delivery_days: "",
+    mainPhoto: null,
+    relationalImages: [],
+  });
+  const [message, setMessage] = useState<string | null>(null);
+  const [isError, setIsError] = useState<boolean>(false);
+
+  // Fetch product data on component mount
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await axios.get<Product>(`/api/products/${productId}`);
+        setProductData(response.data);
+      } catch (error) {
+        console.error("Error fetching product data:", error);
+        setMessage("Error fetching product data.");
+        setIsError(true);
+      }
+    };
+
+    if (productId) {
+      fetchProduct();
+    }
+  }, [productId]);
+
+  // Handle form changes
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  // Handle file change for main photo
+  const handleMainPhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData({
+        ...formData,
+        mainPhoto: file,
+      });
+    }
+  };
+  
+
+  // Handle file change for relational images
+  const handleRelationalImagesChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      setFormData({
+        ...formData,
+        relationalImages: Array.from(files),
+      });
+    }
+  };
+  
+
+  // Validate required fields
+  const validateForm = () => {
+    const requiredFields = ["sizes", "colors", "state", "stock", "delivery_days"];
+    for (const field of requiredFields) {
+      if (!formData[field as keyof FormData]) {
+        setMessage("Please fill out all required fields.");
+        setIsError(true);
+        return false;
+      }
+    }
+    setMessage(null);
+    return true;
+  };
+
+  // Update relational images separately
+  const updateRelationalImages = async () => {
+    const relationalFormData = new FormData();
+    relationalFormData.append("productId", productId.toString());
+    formData.relationalImages.forEach((image) => {
+      relationalFormData.append("relational_images", image);
+    });
+
+    try {
+      await axios.post(`/api/products/relational_images`, relationalFormData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setMessage("Relational images updated successfully!");
+      setIsError(false);
+    } catch (error: any) {
+      console.error("Error updating relational images:", error);
+      const errorMsg = error.response?.data?.error || "Error updating relational images";
+      setMessage(errorMsg);
+      setIsError(true);
+    }
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!validateForm()) return; // Prevent submission if validation fails
+
+    const form = new FormData();
+    form.append("sizes", formData.sizes || productData?.sizes || "");
+    form.append("colors", formData.colors || productData?.colors || "");
+    form.append("state", formData.state || productData?.state || "");
+    form.append("stock", formData.stock || productData?.stock?.toString() || "");
+    form.append("discount", formData.discount || productData?.discount?.toString() || "");
+    form.append("delivery_days", formData.delivery_days || productData?.delivery_days?.toString() || "");
+
+    // Append main photo
+    form.append("image", formData.mainPhoto || productData?.image || "");
+
+    try {
+      await axios.put(`/api/products/setup/${productId}`, form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setMessage("Product updated successfully!");
+      setIsError(false);
+      await updateRelationalImages();
+    } catch (error: any) {
+      console.error("Error updating product:", error);
+      const errorMsg = error.response?.data?.error || "Error updating product";
+      setMessage(errorMsg);
+      setIsError(true);
+    }
+  };
+  return (
+    <div className="fixed flex justify-center items-center bg-slate-100 w-full h-full top-0 left-0 z-30 backdrop-blur-sm bg-opacity-50">
+      <i
+        onClick={onClose}
+        className="bi bi-x absolute right-2 px-2 py-1 border top-2 text-2xl font-bold cursor-pointer text-red-400 border-red-300 hover:bg-slate-50 hover:border rounded-full"
+      ></i>
+      <div className="min-w-[85%] min-h-[84%] rounded-xl px-6 py-3 bg-white border shadow-md">
+        <h1 className="text-2xl mb-4">
+          Product Setup / Edit
+        </h1>
+        
+        <form onSubmit={handleSubmit} className="w-full h-full">
+          <div className="flex flex-nowrap h-[68vh] w-full overflow-hidden overflow-y-visible">
+           
+           
+           
+            {/* Left side for setup and updating product */}
+            <div className="w-1/2 p-4">
+              <h2 className="text-xl font-semibold mb-4">Update Product Data</h2>
+              <div className="mb-4">
+                <label className="font-medium text-slate-500 mb-1">Cloth Sizes</label>
+                <input
+                  type="text"
+                  name="sizes"
+                  className="w-full p-2 border rounded"
+                  placeholder="Enter sizes (e.g., S, M, L)"
+                  value={formData.sizes}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="font-medium text-slate-500 mb-1">Colors Available</label>
+                <input
+                  type="text"
+                  name="colors"
+                  className="w-full p-2 border rounded"
+                  placeholder="Enter colors (e.g., Red, Blue)"
+                  value={formData.colors}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="font-medium text-slate-500 mb-1">State</label>
+                <select
+                  name="state"
+                  className="w-full p-2 border rounded"
+                  value={formData.state}
+                  onChange={handleChange}
+                >
+                  <option value="">Select state</option>
+                  <option value="new">New</option>
+                  <option value="used">Used</option>
+                </select>
+              </div>
+
+              <div className="mb-4">
+                <label className="font-medium text-slate-500 mb-1">In Stock Amount</label>
+                <input
+                  type="number"
+                  name="stock"
+                  className="w-full p-2 border rounded"
+                  placeholder="Enter stock quantity"
+                  value={formData.stock}
+                  onChange={handleChange}
+                />
+              </div>
+
+
+              <div className="mb-4">
+                <label className="font-medium text-slate-500 mb-1">Delivery Days</label>
+                <input
+                  type="number"
+                  name="delivery_days"
+                  className="w-full p-2 border rounded"
+                  placeholder="Enter delivery days"
+                  value={formData.delivery_days}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="font-medium text-slate-500 mb-1">Change Main Photo</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleMainPhotoChange}
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="font-medium text-slate-500 mb-1">Add Relational Images</label>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleRelationalImagesChange}
+                />
+              </div>
+            </div>
+             {/* right side for current product data */}
+             <div className="w-1/2 p-4 bg-slate-50">
+              <h2 className="text-xl font-semibold mb-4">Product data</h2>
+              {productData && (
+                <div className="border p-2">
+                  <div className="mb-4 flex justify-center items-center">
+                    <div className="w-[150px] h-[150px]">
+                        <img src={productData.image} alt="Current Main" className="object-contain rounded" />
+                    </div>
+                  </div>
+                  <div className="flexflex-col">
+
+                  <div className="flex space-x-2">
+                    <label className="text-sm text-nowrap text-slate-500 mb-1">Name:</label>
+                    <p className="text-slate-400 text-xs ">{productData.name}</p>
+                  </div>
+                  
+                  <div className="flex space-x-2">
+                    <label className="text-sm text-nowrap text-slate-500 mb-1">Cloth Sizes:</label>
+                    <p className="text-slate-400 text-xs ">{productData.sizes}</p>
+                  </div>
+
+                  <div className="flex space-x-2">
+                    <label className="text-sm text-nowrap text-slate-500 mb-1">Colors Available:</label>
+                    <p className="text-slate-400 text-xs ">{productData.colors}</p>
+                  </div>
+
+                  <div className="flex space-x-2">
+                    <label className="text-sm text-nowrap text-slate-500 mb-1">State:</label>
+                    <p className="text-slate-400 text-xs ">{productData.state}</p>
+                  </div>
+                  </div>
+                  <div>
+                  <div className="flex space-x-2">
+                    <label className="text-sm text-nowrap text-slate-500 mb-1">In Stock:</label>
+                    <p className="text-slate-400 text-xs ">{productData.stock}</p>
+                  </div>
+
+                  <div className="flex space-x-2">
+                    <label className="text-sm text-nowrap text-slate-500 mb-1">Discount:</label>
+                    <p className="text-gray-600 bg-red-300 w-slate-400 text-xs h-auto">{productData.discount || 0}%</p>
+                  </div>
+
+                  <div className="flex space-x-2">
+                    <label className="text-sm text-nowrap text-slate-500 mb-1">Delivery Days:</label>
+                    <p className="text-slate-400 text-xs ">{productData.delivery_days} Days</p>
+                  </div>
+                  </div>
+
+                  
+
+                  <div className="mb-4">
+                    <label className="text-sm text-nowrap text-slate-500 mb-1">Relational Images:</label>
+                    <div className="flex space-x-2">
+                    {productData.relational_images && productData.relational_images.length > 0 ? (
+                        productData.relational_images.map((image, index) => (
+                          <img key={index} src={image} alt={`Relational ${index + 1}`} className="w-16 h-16 rounded" />
+                        ))
+                      ) : (
+                        <p className="text-gray-600">No relational images available.</p>
+                      )}
+                    </div>
+                   </div>
+
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex justify-between items-center mt-4">
+            <div className={`${isError ? 'bg-red-200 text-red-600': 'bg-green-200 text-green-600' } px-2`}>
+              {message}
+            </div>
+            <div>
+              <button
+              type="button"
+              className="bg-red-500 text-white py-1 px-6 rounded hover:bg-red-600 mx-4"
+              onClick={onClose}
+             >
+              Cancel
+             </button>
+             <button
+              type="submit"
+              className="bg-green-500 text-white py-1 px-6 rounded hover:bg-blue-600"
+             >
+              Save
+             </button>
+            </div>
+            
+            
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default SetupProduct;

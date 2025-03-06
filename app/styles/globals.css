@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+/* Hide the scrollbar */
+.navbar-container {
+    overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
+  }
+  
+  .navbar-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+  
+  /* Show scrollbar on hover */
+  .navbar-container:hover {
+    scrollbar-width: thin; /* Firefox */
+  }
+  
+  .navbar-container:hover::-webkit-scrollbar {
+    display: block; /* Chrome, Safari, Opera */
+    width: 8px;
+  }
+  
+  .navbar-container:hover::-webkit-scrollbar-thumb {
+    background-color: #e4e4e4;
+    border-radius: 10px;
+  }
+  
+  .navbar-container:hover::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+  }
+
+
+  /* Hide the scrollbar on setup product */
+.setupbar {
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.setupbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Show scrollbar on hover */
+.setupbar:hover {
+  scrollbar-width: thin; /* Firefox */
+}
+
+.setupbar:hover::-webkit-scrollbar {
+  display: block; /* Chrome, Safari, Opera */
+  width: 6px;
+}
+
+.setupbar:hover::-webkit-scrollbar-thumb {
+  background-color: #f1f1f1;
+  border-radius: 8px;
+}
+
+.setupbar:hover::-webkit-scrollbar-track {
+  background-color: #ffbdbd;
+}
