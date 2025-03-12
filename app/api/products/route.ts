@@ -1,7 +1,5 @@
 export const dynamic = "force-dynamic";
 
-
-
 import { NextResponse } from "next/server";
 import client from "../db"; // Adjust the path as needed
 

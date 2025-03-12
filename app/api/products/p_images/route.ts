@@ -1,36 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-const cloudinary = require('../../claudinary'); // Adjust to your Cloudinary file
+
 import client from '../../db';
-import fs from 'fs/promises';
-import path from 'path';
-import os from 'os';
+import uploadDocumentToSupabase, { deleteDocumentFromSupabase } from '../../supabase';
 
-// Upload Image to Cloudinary
-async function uploadImageToCloudinary(file: File, title: string): Promise<string> {
-  try {
-    const tempDir = os.tmpdir();
-    const documentPath = path.join(tempDir, file.name);
-    const buffer = await file.arrayBuffer();
-
-    await fs.writeFile(documentPath, Buffer.from(buffer)); // Async write
-
-    // Convert title to a valid Cloudinary public_id format
-    const publicId = title.replace(/\s+/g, "_").toLowerCase();
-
-    // Upload to Cloudinary
-    const uploadResult = await cloudinary.uploader.upload(documentPath, {
-      use_filename: true,
-      folder: 'bia/uploads/images/products/relational_images',
-      public_id: publicId,
-      resource_type: 'image', // Ensure correct resource type
-    });
-
-    await fs.unlink(documentPath); // Remove the temp file asynchronously
-    return uploadResult.secure_url;
-  } catch (error) {
-    console.error("Cloudinary Upload Error:", error);
-    throw new Error("Failed to upload to Cloudinary");
+function splitByKRB(word: string) {
+  const parts = word.split("/bia/");
+  
+  if (parts.length === 1) {
+      return { left: word, right: "" }; // If 'krb' is not found
   }
+
+  return { left: parts[0], right: parts.slice(1).join("krb") }; // Preserve everything after 'krb'
 }
 
 // Handle PUT request for updating a product
@@ -48,8 +28,16 @@ export async function PUT(req: NextRequest) {
 
     // Upload images to Cloudinary
     const uploadedImages = await Promise.all(
-      files.map((file) => uploadImageToCloudinary(file, file.name))
+      files.map((file) => uploadDocumentToSupabase(file, file.name+""+id))
     );
+    const current_images = await client.query(`SELECT * FROM product_relational_images WHERE product_id = $1`,[id]);
+    const results = current_images.rows;
+
+    for (const url of results) {
+      const n = splitByKRB(url.image_url);
+      await deleteDocumentFromSupabase(n.right);
+    }
+
     await client.query(`DELETE FROM product_relational_images WHERE product_id = $1`,[id]);
     // Insert image URLs into the database
     for (const imageUrl of uploadedImages) {

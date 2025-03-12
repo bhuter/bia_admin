@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import client from "../../db";
-const cloudinary = require('../../claudinary');
-const fs = require('fs');
-const path = require('path');
-const os = require('os'); // Import os to get the temporary directory
+import uploadDocumentToSupabase from "../../supabase";
 
 // Define types for the product request
 type ProductRequest = {
@@ -14,36 +11,6 @@ type ProductRequest = {
   stock: string;
   image: File; // Keep as is for handling image file
 };
-
-// Helper to upload document to Cloudinary
-async function uploadImageToCloudinary(file: File, title: string): Promise<string> {
-  try {
-    const tempDir = os.tmpdir(); // Use OS temporary directory
-    const documentPath = path.join(tempDir, file.name); // Save the file with its original title
-    const buffer = await file.arrayBuffer(); // Get the file's buffer
-    fs.writeFileSync(documentPath, Buffer.from(buffer)); // Write the buffer to a file
-
-    // Convert title to a valid Cloudinary public_id format
-    const publicId = title.replace(/\s+/g, "_").toLowerCase(); // Replace spaces with underscores
-
-    console.log("Uploading image to Cloudinary...");
-
-    // Upload the document to Cloudinary
-    const uploadResult = await cloudinary.uploader.upload(documentPath, {
-      use_filename: true, // Use the specified public_id as the file name
-      folder: 'bia/uploads/images/products',
-      public_id: publicId, // Assign custom public_id
-    });
-
-    console.log("Cloudinary Upload Response:", uploadResult);
-
-    fs.unlinkSync(documentPath); // Remove the temporary file after upload
-    return uploadResult.secure_url; // Return the uploaded document's URL
-  } catch (error) {
-    console.error("Cloudinary Upload Error:", error);
-    throw new Error("Image upload failed");
-  }
-}
 
 // Helper function to hash the product ID
 async function hashId(id: number): Promise<string> {
@@ -78,7 +45,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     let image;
     try {
-      image = await uploadImageToCloudinary(productData.image, productData.name);
+      image = await uploadDocumentToSupabase(productData.image, productData.name);
     } catch (uploadError) {
       return NextResponse.json({ error: "Image upload failed", details: uploadError }, { status: 500 });
     }
