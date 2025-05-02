@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@getbrevo/brevo": "^2.2.0",
     "@google-cloud/storage": "^7.15.2",
     "@supabase/supabase-js": "^2.49.1",
     "axios": "^1.7.7",

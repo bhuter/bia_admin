@@ -182,6 +182,12 @@ const OrderList = ({ onSetupOrderClick, onViewDetailsClick } : OrderListProprs) 
     const [search, setSearch] = useState("");
     const [filter, setFilter] =useState("");
     const [currentPage, setCurrentPage] = useState(1);
+  const [role, setRole] = useState("");
+
+  useEffect(() => {
+    const session = JSON.parse(localStorage.getItem("adminSession") || "null");
+    setRole(session?.role);
+  }, [role])
 
     const itemsPerPage = 15;
   
@@ -282,7 +288,9 @@ const OrderList = ({ onSetupOrderClick, onViewDetailsClick } : OrderListProprs) 
       return <div className="text-center text-red-500 py-6"> {error}</div>;
   }
 
-
+  if(role !== "admin"){
+    <div className="fixed w-full h-full z-50 pointer-events-none"></div>
+  }
   return (
     <div className="border rounded-lg p-4 bg-white">
        <div className="flex justify-between my-1 items-center">
@@ -384,7 +392,7 @@ const OrderList = ({ onSetupOrderClick, onViewDetailsClick } : OrderListProprs) 
                                                 </li>
                                               ) : order.payment_status === "Paid" && order.status === "Pending" ? (
                                                 <>
-                                                <li 
+                                                {order.payment_status === "Paid" && (<li 
                                                   className="px-4 py-2 cursor-pointer hover:bg-gray-100 flex items-center"
                                                   onClick={() => {
                                                     onSetupOrderClick(order.order_number+", "+order.order_id); // Assign the Order
@@ -392,7 +400,7 @@ const OrderList = ({ onSetupOrderClick, onViewDetailsClick } : OrderListProprs) 
                                                 }}
                                                 >
                                                   <i className="bi bi-check-circle mr-2 text-green-500 hover:bg-slate-100"></i> Assign
-                                                </li>
+                                                </li>)}
                                                 
                                                 <li
                                                   className="px-4 py-2 cursor-pointer hover:bg-gray-100 flex items-center"
@@ -427,7 +435,7 @@ const OrderList = ({ onSetupOrderClick, onViewDetailsClick } : OrderListProprs) 
                                                 </>
                                               ) : order.status === "Canceled" ? (
                                                 <>
-                                                <li 
+                                                 {order.payment_status === "Paid" && (<li 
                                                   className="px-4 py-2 cursor-pointer hover:bg-gray-100 flex items-center"
                                                   onClick={() => {
                                                     onSetupOrderClick(order.order_number+", "+order.order_id); // Assign the Order
@@ -435,7 +443,7 @@ const OrderList = ({ onSetupOrderClick, onViewDetailsClick } : OrderListProprs) 
                                                 }}
                                                 >
                                                   <i className="bi bi-check-circle mr-2 text-green-500 hover:bg-slate-100"></i> Assign
-                                                </li>
+                                                </li>)}
                                                 <li
                                                   className="px-4 py-2 cursor-pointer hover:bg-gray-100 flex items-center"
                                                   onClick={() => {
@@ -448,7 +456,7 @@ const OrderList = ({ onSetupOrderClick, onViewDetailsClick } : OrderListProprs) 
                                                 </>
                                               ) : (
                                                 <>
-                                                 <li 
+                                                 {order.payment_status === "Paid" && (<li 
                                                   className="px-4 py-2 cursor-pointer hover:bg-gray-100 flex items-center"
                                                   onClick={() => {
                                                     onSetupOrderClick(order.order_number+", "+order.order_id); // Assign the Order
@@ -456,7 +464,7 @@ const OrderList = ({ onSetupOrderClick, onViewDetailsClick } : OrderListProprs) 
                                                 }}
                                                 >
                                                   <i className="bi bi-check-circle mr-2 text-green-500 hover:bg-slate-100"></i> Assign
-                                                </li>
+                                                </li>)}
                                                 <li
                                                   className="px-4 py-2 cursor-pointer hover:bg-gray-100 flex items-center"
                                                   onClick={() => {

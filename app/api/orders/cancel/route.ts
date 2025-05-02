@@ -25,6 +25,11 @@ export async function PUT(req: NextRequest): Promise<NextResponse> {
         if (OrderResult.rows.length === 0) {
             return NextResponse.json({ message: "Order not found." }, { status: 404 });
         }
+        const message = `Your order [${OrderResult.rows[0].order_number}] has been canceled by admin.`;
+
+        const notification = `INSERT INTO notification(content_text, user_id, event, system, view, action_required, admin, mailed, sms, created_at) VALUES($1, $2, $3, $4, $5, $6, $7, 'false', 'false', NOW())`;
+        await client.query(notification, [message, OrderResult.rows[0].user_id, "Updates", "true", "Unread", `/dash/profile`, "Unread"])
+
 
         return NextResponse.json(OrderResult.rows[0], { status: 200 });
     } catch (error) {

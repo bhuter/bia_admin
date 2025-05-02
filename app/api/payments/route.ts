@@ -28,7 +28,7 @@ export async function GET(req: Request) {
     }
 
     if (conditions.length > 0) {
-      query += ` WHERE status = 'approved' AND ${conditions.join(" AND ")}`;
+      query += ` WHERE ${conditions.join(" AND ")}`;
     }
 
     // Handle sorting

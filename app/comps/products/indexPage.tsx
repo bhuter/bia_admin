@@ -150,6 +150,12 @@ const ProductList = ({ onSetupProductClick }: { onSetupProductClick: (productId:
   const [search, setSearch] = useState("");
   const [filter, setFilter] =useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [role, setRole] = useState("");
+
+  useEffect(() => {
+    const session = JSON.parse(localStorage.getItem("adminSession") || "null");
+    setRole(session?.role);
+  }, [role])
 
   const itemsPerPage = 15;
 
@@ -361,6 +367,18 @@ const handleDelete = async (productId: number) => {
                                   {dropdownOpen === product.id && (
                                       <div className="absolute right-0 mt-1 mr-1 w-36 bg-white border rounded-md shadow-lg z-10">
                                           <ul className="py-1 text-gray-700">
+                                              {role !== 'admin' ? (
+                                              <li
+                                                  className="px-4 py-2 cursor-pointer hover:bg-gray-100 flex items-center"
+                                                  onClick={() => {
+                                                      onSetupProductClick(product.id); // Trigger the setup product click
+                                                      toggleDropdown(product.id); // Close the dropdown
+                                                  }}
+                                              >
+                                                  <i className="bi bi-gear-fill mr-2 text-blue-500 hover:bg-slate-100"></i> Publish
+                                              </li>
+                                            ) : (
+                                              <>
                                               <li
                                                   className="px-4 py-2 cursor-pointer hover:bg-gray-100 flex items-center"
                                                   onClick={() => {
@@ -388,6 +406,8 @@ const handleDelete = async (productId: number) => {
                                               >
                                                   <i className="bi bi-trash mr-2 text-red-500 hover:bg-slate-100"></i> Delete
                                               </li>
+                                              </>
+                                              )}
                                           </ul>
                                       </div>
                                   )}

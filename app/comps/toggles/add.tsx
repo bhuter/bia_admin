@@ -34,8 +34,7 @@ useEffect(() => {
         formData.firstName.length >= 3 &&
         formData.lastName.length >= 3 &&
         /^[0-9]{10}$/.test(formData.phone) &&
-        /\S+@\S+\.\S+/.test(formData.email) &&
-        formData.password.length >= 6;
+        /\S+@\S+\.\S+/.test(formData.email)
 
     setIsFormValid(isValid);
 }, [formData]);
@@ -64,12 +63,6 @@ const handleChange = (e: any) => {
             setErrors({
                 ...errors,
                 email: !/\S+@\S+\.\S+/.test(value) ? "Enter a valid email address." : "",
-            });
-            break;
-        case "password":
-            setErrors({
-                ...errors,
-                password: value.length < 6 ? "Password must be at least 6 characters long." : "",
             });
             break;
         default:
@@ -185,7 +178,7 @@ const handleSubmit = async (e: any) => {
                                 className="px-5 py-3 outline-none border-slate-300 text-sm border rounded-3xl my-1"
                                 onChange={handleChange}
                                 value={"BiaAgent@123"}
-                                required
+                                disabled
                             />
                             <span className="text-red-500 text-sm">{errors.password}</span>
                         </div>

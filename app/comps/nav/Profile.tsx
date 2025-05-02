@@ -14,7 +14,7 @@ const Profile = ({ menuCollapsed, toggleMenu }: ProfileProps) => {
       <div className={`flex items-center justify-between py-1 mb-2 mx-1 ${menuCollapsed ? 'flex-col' : ''}`}>
         <div className="flex items-center">
           <div className="w-[30px] h-[30px] rounded-full mx-1 transition-all duration-300 ease-in-out hover:scale-110">
-            <img src="/favicon.ico" alt="Logo" className="w-full h-full object-cover" />
+            <img src="/logo.ico" alt="Logo" className="w-full h-full object-cover" />
           </div>
           <h4 className={`text-yellow-800 text-xl ml-1 font-semibold transition-all duration-300 ${menuCollapsed ? 'hidden' : ''}`}>
             BIA_ADMIN

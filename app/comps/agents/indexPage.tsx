@@ -365,7 +365,7 @@ const AgentsList = () => {
                               <td className="py-2 px-2">
                                 <span
                                       className={`py-1 px-3 rounded text-xs text-nowrap capitalize  ${
-                                          (Agent.status === "active")
+                                          ((Agent.status).toLowerCase() === "active")
                                               ? "bg-green-100 text-green-600"
                                               : "bg-orange-100 text-orange-500"
                                       }`}

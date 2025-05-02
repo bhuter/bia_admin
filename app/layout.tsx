@@ -53,7 +53,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
 
   return (
     <html lang="en">
-      <head><title>{pageTitle}</title></head>
+      <head>
+        <title>{pageTitle}</title>
+        <link rel="shortcut icon" href="/logo.ico" type="image/x-icon" />
+      </head>
       <body className="bg-slate-50 transition-all duration-300 ease-in-out">
         {/* Sidebar - Fixed */}
         <nav

@@ -56,7 +56,7 @@ export async function GET(req: Request) {
     }
 
     if (conditions.length) {
-      query += ` WHERE o.status = 'Approved' AND ${conditions.join(" AND ")}`;
+      query += ` WHERE ${conditions.join(" AND ")}`;
     }
 
     // Sorting

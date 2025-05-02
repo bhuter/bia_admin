@@ -16,7 +16,6 @@ async function hashPassword(password: string): Promise<string> {
 // Login handler
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const { userName, password } = await req.json();
-
   // Input validation
   if (!userName || !password) {
     return NextResponse.json({ message: "Both fields are required." }, { status: 400 });
@@ -34,28 +33,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ message: "Invalid login credentials." }, { status: 400 });
     }
 
-    console.log("User found:", user.id);
-
-    // Check password hash
-    if(user && user.role === "admin"){
-      // Return success response
-    return NextResponse.json(
-      {
-        message: "Login successful!",
-        user: {
-          id: user.id,
-          name: `${user.first_name} ${user.last_name}`,
-          email: user.email,
-          session_id: user.hashed_id,
-        },
-      },
-      { status: 200 }
-    );
-    }else {
+  
     if ((await hashPassword(password)) !== user.password) {
       return NextResponse.json({ message: "Invalid login credentials." }, { status: 400 });
     }
-
+    
+    if(((user.status).toLowerCase() !==  'active')){
+      return NextResponse.json({ message: "Your account is not allowed to login. Please contact admin." }, { status: 400 });
+    }
     // Return success response
     return NextResponse.json(
       {
@@ -65,11 +50,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           name: `${user.first_name} ${user.last_name}`,
           email: user.email,
           session_id: user.hashed_id,
+          role: user.role,
         },
       },
       { status: 200 }
     );
-  }
+
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(

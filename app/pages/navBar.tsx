@@ -14,12 +14,18 @@ const NavBar = ({ menuCollapsed, toggleMenu, onNavigate }: NavBarProps) => {
   const [currentPath, setCurrentPath] = useState(""); // Use state to track current path
   const pathname = usePathname();
   const router = useRouter();
+  const [role, setRole] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       setCurrentPath(window.location.pathname); // Get current pathname from window object
     }
   }, [router]);
+
+  useEffect(() => {
+      const session = JSON.parse(localStorage.getItem("adminSession") || "null");
+      setRole(session?.role);
+  }, [role])
 
   const menu = [
     { name: "Dashboard", url: "/", icon: "bi bi-grid" },
@@ -51,22 +57,35 @@ const NavBar = ({ menuCollapsed, toggleMenu, onNavigate }: NavBarProps) => {
       <div className="navbar-container max-h-[85vh] overflow-hidden mx-2 mt-3">
         <h4 className="text-gray-600 text-md">MENU</h4>
         <div className="py-1 flex flex-col">
-          {menu.map((tab, index) => (
-            <Link
-              key={index}
-              href={tab.url}
-              onClick={() => onNavigate(tab.name)} // Update the page name on navigation
-              className={`flex items-center py-2 px-3 text-gray-500 text-sm rounded-md hover:bg-slate-100 hover:text-gray-900 transition-all duration-300 ${
-                pathname === tab.url ? 'bg-slate-200 text-gray-900' : ''
-              }`}
-            >
-              <i className={`${tab.icon} mr-2 text-xl transition-all duration-300 hover:text-sky-500`}></i>
-              <span className={`${menuCollapsed ? 'hidden' : 'block'} transition-all duration-300 sm:block md:block lg:block`}>
-                {tab.name}
-              </span>
-            </Link>
-          ))}
-        </div>
+  {menu.map((tab, index) => {
+    const isAdminTab = ['Agents', 'Orders', 'Promotions', 'Customers'].includes(tab.name);
+    const shouldRender =
+      role === 'admin' || (!isAdminTab && tab.name !== '');
+
+    if (!shouldRender) return null;
+
+    return (
+      <Link
+        key={index}
+        href={tab.url}
+        onClick={() => onNavigate(tab.name)} // Update the page name on navigation
+        className={`flex items-center py-2 px-3 text-gray-500 text-sm rounded-md hover:bg-slate-100 hover:text-gray-900 transition-all duration-300 ${
+          pathname === tab.url ? 'bg-slate-200 text-gray-900' : ''
+        }`}
+      >
+        <i className={`${tab.icon} mr-2 text-xl transition-all duration-300 hover:text-sky-500`}></i>
+        <span
+          className={`${
+            menuCollapsed ? 'hidden' : 'block'
+          } transition-all duration-300 sm:block md:block lg:block`}
+        >
+          {tab.name}
+        </span>
+      </Link>
+    );
+  })}
+</div>
+
         <h4 className="text-gray-600 text-md border-t py-2 mt-3">TAILORS COLLEGE</h4>
         <div className="py-1 flex flex-col">
           {tailors.map((tab, index) => (

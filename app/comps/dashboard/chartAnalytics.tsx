@@ -13,7 +13,7 @@ interface Analytics {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     }).format(amount);
-  };
+  }; 
 const SalesAnalytics = () => {
     const [analytics, setAnalytics] = useState<Analytics[] | any>(null); // Updated to be an array
     const [loading, setLoading] = useState(false);
@@ -47,7 +47,22 @@ const SalesAnalytics = () => {
   
       fetchAnalytics();
     }, []);
-  
+
+    let sum: number = 0;
+    let total: number = 0;
+    useEffect(() => {
+      for (let i = 0; i < analytics?.length; i++) {
+       const element = analytics[i];
+       sum += element.previous;
+      }
+      for (let i = 0; i < analytics?.length; i++) {
+        const element = analytics[i];
+        sum += element.current;
+       }
+    }, [])
+    
+
+    
     // Check if analytics data is available
     const totals = analytics ? calculateTotals(analytics) : { previous: 0, current: 0 };
 
@@ -61,12 +76,12 @@ const SalesAnalytics = () => {
                         <h3 className="text-xs text-gray-500 mb-2 mr-2">
                             <span className="mr-2 text-teal-500">●</span>
                             <span className="text-gray-800">Current Week</span>
-                            <span className="ml-2">{formatNumber(totals.current)}RWF</span>
+                            <span className="ml-2">{formatNumber(total)}RWF</span>
                         </h3>
                         <h3 className="text-xs text-gray-500">
                             <span className="mr-2 text-pink-500">●</span>
                             <span className="text-gray-800">Previous Week</span>
-                            <span className="ml-2">{formatNumber(totals.previous)} RWF</span>
+                            <span className="ml-2">{formatNumber(sum)} RWF</span>
                         </h3>
                     </div>
                 </div>

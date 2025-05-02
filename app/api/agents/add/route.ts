@@ -13,10 +13,10 @@ async function hashPassword(password: string): Promise<string> {
 
 // Register a new user
 export async function POST(req: NextRequest): Promise<NextResponse> {
-    const { firstName, lastName, email, phone, nationality, password } = await req.json();
+    const { firstName, lastName, email, phone, nationality } = await req.json();
 
     // Input validation
-    if (!firstName || !lastName || !email || !phone || !nationality || !password) {
+    if (!firstName || !lastName || !email || !phone || !nationality) {
         return NextResponse.json({ message: "All fields are required." }, { status: 400 });
     }
 
@@ -39,6 +39,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         const photo = "";
         const createdAt = new Date();
         const updated_at = null;
+        const password = "BiaAgent@123";
 
         // Hash the password
         const hashedPassword = await hashPassword(password);

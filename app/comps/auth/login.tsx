@@ -43,12 +43,13 @@ const LoginForm: React.FC = () => {
                 name: response.data.user.name,
                 session_id: response.data.user.session_id,
                 photo: response.data.user.photo,
+                role: response.data.user.role,
             }));
 
             setResponseMessage(response.data.message || "Login successfully!");
             setIsSuccess(true);
             setIsError(false);
-            router.push('/');
+            window.location.assign("/");
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 setResponseMessage(error.response?.data.message || "Login failed due to server error.");

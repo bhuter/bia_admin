@@ -43,7 +43,7 @@ const Logout: React.FC = () => {
     }, [router]);
 
     return (
-        <div className="flex justify-center items-center h-screen">
+        <div className="flex justify-center items-center h-[40vh]">
             <head>
                 <title>Signing out</title>
             </head>
