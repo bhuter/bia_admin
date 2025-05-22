@@ -1,8 +1,3 @@
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
 
 import { NextRequest, NextResponse } from "next/server";
 import client from "../../db";
@@ -73,7 +68,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       }
     } catch (dbError) {
       console.error("Database Error:", dbError);
-      return NextResponse.json({ error: "Database error", details: dbError }, { status: 500 });
+      return NextResponse.json({ message: "Database error", details: dbError }, { status: 500 });
     }
 
     const productId = result.rows[0].id;
@@ -93,13 +88,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       );
     } catch (updateError) {
       console.error("Database Update Error:", updateError);
-      return NextResponse.json({ error: "Database update failed", details: updateError }, { status: 500 });
+      return NextResponse.json({ message: "Database update failed", details: updateError }, { status: 500 });
     }
 
     return NextResponse.json({ message: "Product added successfully", product: result.rows[0] }, { status: 201 });
 
   } catch (error) {
     console.error("Unexpected Error:", error);
-    return NextResponse.json({ error: "Unexpected server error", details: error }, { status: 500 });
+    return NextResponse.json({ message: "Unexpected server error", details: error }, { status: 500 });
   }
 }

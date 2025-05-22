@@ -6,6 +6,7 @@ interface OrderDetailsProps {
       order_number: number;
       total_amount: string;
       Orders: string;
+      details: string;
       status: string;
       created_at: string;
       user_id: number;
@@ -52,7 +53,9 @@ const OrderDetailsPopup: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-sm text-slate-700">
                     <p><strong>Order ID:</strong> {order.order_id}</p>
+                    
                     <p><strong>Order Number:</strong> {order.order_number}</p>
+                     <p><strong>Details:</strong> {order.details}</p>
                     <p><strong>Status:</strong> 
                         <span className={`px-3 py-1 ml-2 text-sm font-medium rounded-full ${order.status === 'Delivered' ? 'bg-teal-100 text-teal-600' : 'bg-amber-100 text-amber-600'}`}>{order.status}</span>
                     </p>

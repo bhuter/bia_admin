@@ -16,7 +16,8 @@ export async function GET(req: Request) {
                 o.order_id, 
                 o.order_number, 
                 o.total_amount, 
-                o.status, 
+                o.status,
+                o.details, 
                 o.created_at, 
                 u.id AS user_id, 
                 u.first_name, 
@@ -31,7 +32,7 @@ export async function GET(req: Request) {
                 ) AS count
             FROM orders o  
             LEFT JOIN users u ON u.id = o.user_id 
-            LEFT JOIN payments p ON CAST(p.order_id AS TEXT) = o.order_number 
+            LEFT JOIN payments p ON p.order_id = CAST(o.order_number AS INTEGER) 
             
         `;
         

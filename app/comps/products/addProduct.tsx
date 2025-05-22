@@ -100,7 +100,7 @@ const AddProduct = ({ onClose }: AddProductProps) => {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Error adding product");
+        throw new Error(error.message);
       }
 
       const data = await response.json();
@@ -109,7 +109,7 @@ const AddProduct = ({ onClose }: AddProductProps) => {
       setSearchTerm("");
       setFilteredCategories([]);
     } catch (error) {
-      console.error("Error adding product:", error);
+      console.error("Error adding product:"+error, error);
       setMessage(String(error));
     } finally {
       setLoading(false);

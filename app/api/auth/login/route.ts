@@ -21,8 +21,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ message: "Both fields are required." }, { status: 400 });
   }
 
-  console.log("Login attempt:", userName, password);
-
   try {
     // Corrected SQL Query (search by email OR phone)
     const sql = "SELECT * FROM users WHERE email = $1 and account_type = 'agent'";

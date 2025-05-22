@@ -7,6 +7,7 @@ interface Order {
     order_number: number;
     total_amount: string;
     Orders: string;
+    details: string;
     status: string;
     created_at: string;
     user_id: number;

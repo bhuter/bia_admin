@@ -1,8 +1,3 @@
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
 
 import { NextRequest, NextResponse } from 'next/server';
 
